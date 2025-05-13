@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import "./../assets/scss/Clock.scss";
 
-export default function Clock({ show, config, solvePuzzle, solved, solvedTrigger }) {
+export default function Clock({ theme }) {
   const [angles, setAngles] = useState({
-    hour: 90,
-    minute: 180,
-    second: 270,
+    hour: 0,
+    minute: 0,
+    second: 0,
   });
 
   const dragging = useRef(null);
@@ -26,7 +26,7 @@ export default function Clock({ show, config, solvePuzzle, solved, solvedTrigger
     const cy = clockRect.top + clockRect.height / 2;
     const dx = e.clientX - cx;
     const dy = e.clientY - cy;
-    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
 
     setAngles((prev) => ({
       ...prev,
@@ -34,23 +34,52 @@ export default function Clock({ show, config, solvePuzzle, solved, solvedTrigger
     }));
   };
 
+  const angleToTime = (angle, max) => {
+    let adjusted = (((angle + 90) % 360) + 360) % 360;
+    return Math.floor((adjusted / 360) * max) % max;
+  };
+
+  const showTime = () => {
+    const h = angleToTime(angles.hour, 12);
+    const m = angleToTime(angles.minute, 60);
+    const s = angleToTime(angles.second, 60);
+
+    const pad = (n) => n.toString().padStart(2, "0");
+    alert(`La hora es: ${pad(h)}:${pad(m)}:${pad(s)}`);
+  };
+
   return (
-    <div className="clock" onMouseMove={handleMouseMove} onMouseUp={stopDrag} onMouseLeave={stopDrag}>
-      <div
+    <div
+      className="clock"
+      onMouseMove={handleMouseMove}
+      onMouseUp={stopDrag}
+      onMouseLeave={stopDrag}
+      style={{ backgroundImage: `url(${theme.clockImg})` }}
+    >
+      <img
+        src={theme.hourImg}
         className={`hand hour ${dragging.current === "hour" ? "dragging" : ""}`}
-        style={{ transform: `rotate(${angles.hour}deg)` }}
+        style={{
+          transform: `rotate(${angles.hour}deg)`,
+        }}
         onMouseDown={startDrag("hour")}
+        draggable={false}
       />
-      <div
+      <img
+        src={theme.minuteImg}
+        draggable={false}
         className={`hand minute ${dragging.current === "minute" ? "dragging" : ""}`}
         style={{ transform: `rotate(${angles.minute}deg)` }}
         onMouseDown={startDrag("minute")}
       />
-      <div
+      <img
+        src={theme.secondImg}
+        draggable={false}
         className={`hand second ${dragging.current === "second" ? "dragging" : ""}`}
         style={{ transform: `rotate(${angles.second}deg)` }}
         onMouseDown={startDrag("second")}
       />
+      <img className="center" src={theme.clockCenterImg} alt="" />
     </div>
   );
 }

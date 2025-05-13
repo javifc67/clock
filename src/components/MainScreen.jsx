@@ -36,7 +36,7 @@ export default function MainScreen({ show, config, solvePuzzle, solved, solvedTr
         className="frame"
         style={{ backgroundImage: `url(${config.theme.backgroundImg})`, height: "100%", width: "100%" }}
       >
-        <Clock />
+        <Clock theme={config.theme} />
       </div>
     </div>
   );

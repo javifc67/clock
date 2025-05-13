@@ -1,33 +1,29 @@
-body,
-html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
 .clock {
   position: relative;
   width: 90vmin;
   height: 90vmin;
-  border: 10px solid white;
-  border-radius: 50%;
   background: radial-gradient(circle, #333, #000);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  .center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5%;
+    height: 5%;
+    background-color: white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .hand {
   position: absolute;
-  width: 50%;
-  height: 4px;
-  background: white;
-  top: 50%;
   left: 50%;
-  transform-origin: 0% 50%;
+  transform-origin: 50% 100%;
+  transform: rotate(0deg);
   cursor: grab;
 }
 
@@ -36,16 +32,19 @@ html {
 }
 
 .hour {
-  height: 6px;
-  background: #ffcc00;
+  height: 30%;
+  top: 20%;
+  left: 48.5%;
 }
 
 .minute {
-  height: 4px;
-  background: #00ccff;
+  height: 40%;
+  top: 10%;
+  left: 48.7%;
 }
 
 .second {
-  height: 2px;
-  background: red;
+  height: 45%;
+  top: 5%;
+  left: 49.5%;
 }
