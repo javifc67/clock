@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./../assets/scss/MainScreen.scss";
 import Clock from "./Clock";
 import { GLOBAL_CONFIG } from "../config/config";
@@ -14,11 +14,18 @@ export default function MainScreen({ show, config, solvePuzzle, solved, solvedTr
     setSeconds(s);
   };
 
+  const lastPlayedRef = useRef(0);
+
   useEffect(() => {
-    console.log(`La hora es: ${hour}:${minutes}:${seconds}`);
-    new Audio(config.theme.tickAudio).play();
+    const now = Date.now();
+    if (now - lastPlayedRef.current > 50) {
+      new Audio(config.theme.tickAudio).play();
+      lastPlayedRef.current = now;
+    }
+
     solvePuzzle({ hour, minutes, seconds });
   }, [hour, minutes, seconds]);
+
   useEffect(() => {
     if (solved) new Audio(config.theme.removeClockAudio).play();
   }, [solved]);
