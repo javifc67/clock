@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import "./../assets/scss/Clock.scss";
 
-export default function Clock({ theme }) {
+export default function Clock({ theme, setTime }) {
   const [angles, setAngles] = useState({
-    hour: 0,
-    minute: 0,
-    second: 0,
+    hour: 170,
+    minute: 180,
+    second: 290,
   });
+
+  useEffect(() => {
+    setTime(angleToTime(angles.hour, 12), angleToTime(angles.second, 60), angleToTime(angles.minute, 60));
+  }, [angles]);
 
   const dragging = useRef(null);
 
@@ -35,17 +39,8 @@ export default function Clock({ theme }) {
   };
 
   const angleToTime = (angle, max) => {
-    let adjusted = (((angle + 90) % 360) + 360) % 360;
+    let adjusted = ((angle % 360) + 360) % 360;
     return Math.floor((adjusted / 360) * max) % max;
-  };
-
-  const showTime = () => {
-    const h = angleToTime(angles.hour, 12);
-    const m = angleToTime(angles.minute, 60);
-    const s = angleToTime(angles.second, 60);
-
-    const pad = (n) => n.toString().padStart(2, "0");
-    alert(`La hora es: ${pad(h)}:${pad(m)}:${pad(s)}`);
   };
 
   return (

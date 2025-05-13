@@ -8,7 +8,7 @@ export let GLOBAL_CONFIG = {
   defaultLocale: "es",
   localStorageKey: "SAFE_20222a",
   passwordLength: 5,
-  message: "¡Has abierto la puerta! \n Pulsa 'Continuar' para entrar a la nueva sala.",
+  message: "Has resuelto el enigma",
   url: "https://vishub.org/pictures/20203.png",
   escapp: {
     endpoint: "https://escapp.etsisi.upm.es/api/escapeRooms/153",

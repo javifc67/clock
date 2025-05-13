@@ -1,34 +1,27 @@
 import { useEffect, useState } from "react";
 import "./../assets/scss/MainScreen.scss";
 import Clock from "./Clock";
+import { GLOBAL_CONFIG } from "../config/config";
 
 export default function MainScreen({ show, config, solvePuzzle, solved, solvedTrigger }) {
-  const [size, setSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
+  const [hour, setHour] = useState(0);
+  const [minutes, setMinutes] = useState(0);
+  const [seconds, setSeconds] = useState(0);
+
+  const setTime = (h, s, m) => {
+    setHour(h);
+    setMinutes(m);
+    setSeconds(s);
+  };
 
   useEffect(() => {
-    const handleResize = () => {
-      const windowWidth = window.innerWidth;
-      const windowHeight = window.innerHeight;
-
-      const aspectRatio = 16 / 9;
-      let width = windowWidth * 0.9;
-      let height = width / aspectRatio;
-
-      if (height > windowHeight * 0.9) {
-        height = windowHeight * 0.9;
-        width = height * aspectRatio;
-      }
-
-      setSize({ width, height });
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    console.log(`La hora es: ${hour}:${minutes}:${seconds}`);
+    new Audio(config.theme.tickAudio).play();
+    solvePuzzle({ hour, minutes, seconds });
+  }, [hour, minutes, seconds]);
+  useEffect(() => {
+    if (solved) new Audio(config.theme.removeClockAudio).play();
+  }, [solved]);
 
   return (
     <div id="MainScreen" className={"screen_wrapper" + (show ? "" : " screen_hidden")}>
@@ -36,7 +29,10 @@ export default function MainScreen({ show, config, solvePuzzle, solved, solvedTr
         className="frame"
         style={{ backgroundImage: `url(${config.theme.backgroundImg})`, height: "100%", width: "100%" }}
       >
-        <Clock theme={config.theme} />
+        <div className={`fade-slide ${solved ? "hide" : ""}`}>
+          <Clock className={`fade-slide ${solved ? "hide" : ""}`} theme={config.theme} setTime={setTime} />
+        </div>
+        <div className="result">{GLOBAL_CONFIG.message}</div>
       </div>
     </div>
   );

@@ -25,7 +25,8 @@ export const THEME_ASSETS = {
     secondImg: "/src/assets/images/manecilla_segundos.png",
     clockImg: "/src/assets/images/reloj.png",
     clockCenterImg: "/src/assets/images/centro_reloj.png",
-    wireAudio: "sounds/pick-wire.wav",
+    tickAudio: "sounds/tick.wav",
+    removeClockAudio: "sounds/drag.wav",
   },
   [THEMES.CONTEMPORARY]: {
     backgroundImg: "/src/assets/images/ancient_wires_puzzle_bg.png",
