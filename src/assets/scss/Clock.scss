@@ -25,29 +25,51 @@
   transform-origin: center bottom;
   transform: rotate(0deg);
   cursor: grab;
+
   &.solved {
     transition: transform 1.5s ease-in-out;
   }
-}
 
-.hand.dragging {
-  cursor: grabbing;
-}
+  &.dragging {
+    cursor: grabbing;
+  }
 
-.hour {
-  height: 30%;
-  top: 20%;
-  left: 48.5%;
-}
+  &.neon {
+    background: #cc66ff;
+    box-shadow: 0 0 10px #cc66ff, 0 0 20px #cc66ff, 0 0 30px #cc66ff;
+    border-radius: 50px;
+    pointer-events: auto;
+  }
 
-.minute {
-  height: 40%;
-  top: 10%;
-  left: 48.7%;
-}
+  &.hour {
+    height: 30%;
+    top: 20%;
+    left: 48.5%;
+    &.neon {
+      left: 49%;
+      width: 15px;
+    }
+  }
 
-.second {
-  height: 45%;
-  top: 5%;
-  left: 49.5%;
+  &.minute {
+    height: 40%;
+    top: 10%;
+    left: 48.7%;
+
+    &.neon {
+      left: 49.5%;
+      width: 10px;
+    }
+  }
+
+  &.second {
+    height: 45%;
+    top: 5%;
+    left: 49.5%;
+    &.neon {
+      width: 5px;
+      background: #ff66ff;
+      box-shadow: 0 0 10px #ff66ff, 0 0 20px #ff66ff, 0 0 30px #ff66ff;
+    }
+  }
 }

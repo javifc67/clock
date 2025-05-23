@@ -94,29 +94,56 @@ export default function Clock({ theme, setTime, dropHandle, solved, config }) {
       onMouseLeave={stopDrag}
       style={{ backgroundImage: `url(${theme.clockImg})` }}
     >
-      <img
-        src={theme.hourImg}
-        className={`hand hour ${dragging.current === "hour" ? "dragging" : ""} ${solved ? "solved" : ""}`}
-        style={{
-          transform: `rotate(${angles.hour}deg)`,
-        }}
-        onMouseDown={startDrag("hour")}
-        draggable={false}
-      />
-      <img
-        src={theme.minuteImg}
-        draggable={false}
-        className={`hand minute ${dragging.current === "minute" ? "dragging" : ""} ${solved ? "solved" : ""}`}
-        style={{ transform: `rotate(${angles.minute}deg)` }}
-        onMouseDown={startDrag("minute")}
-      />
-      <img
-        src={theme.secondImg}
-        draggable={false}
-        className={`hand second ${dragging.current === "second" ? "dragging" : ""} ${solved ? "solved" : ""}`}
-        style={{ transform: `rotate(${angles.second}deg)` }}
-        onMouseDown={startDrag("second")}
-      />
+      {/* Hour hand */}
+      {theme.hourImg ? (
+        <img
+          src={theme.hourImg}
+          className={`hand hour ${dragging.current === "hour" ? "dragging" : ""} ${solved ? "solved" : ""}`}
+          style={{ transform: `rotate(${angles.hour}deg)` }}
+          onMouseDown={startDrag("hour")}
+          draggable={false}
+        />
+      ) : (
+        <div
+          className={`hand neon hour ${dragging.current === "hour" ? "dragging" : ""} ${solved ? "solved" : ""}`}
+          style={{ transform: `rotate(${angles.hour}deg)` }}
+          onMouseDown={startDrag("hour")}
+        />
+      )}
+
+      {/* Minute hand */}
+      {theme.minuteImg ? (
+        <img
+          src={theme.minuteImg}
+          className={`hand minute ${dragging.current === "minute" ? "dragging" : ""} ${solved ? "solved" : ""}`}
+          style={{ transform: `rotate(${angles.minute}deg)` }}
+          onMouseDown={startDrag("minute")}
+          draggable={false}
+        />
+      ) : (
+        <div
+          className={`hand neon minute ${dragging.current === "minute" ? "dragging" : ""} ${solved ? "solved" : ""}`}
+          style={{ transform: `rotate(${angles.minute}deg)` }}
+          onMouseDown={startDrag("minute")}
+        />
+      )}
+
+      {/* Second hand */}
+      {theme.secondImg ? (
+        <img
+          src={theme.secondImg}
+          className={`hand second ${dragging.current === "second" ? "dragging" : ""} ${solved ? "solved" : ""}`}
+          style={{ transform: `rotate(${angles.second}deg)` }}
+          onMouseDown={startDrag("second")}
+          draggable={false}
+        />
+      ) : (
+        <div
+          className={`hand neon second ${dragging.current === "second" ? "dragging" : ""} ${solved ? "solved" : ""}`}
+          style={{ transform: `rotate(${angles.second}deg)` }}
+          onMouseDown={startDrag("second")}
+        />
+      )}
       <img className="center" draggable={false} src={theme.clockCenterImg} alt="" />
     </div>
   );

@@ -12,7 +12,7 @@ import MainScreen from "./MainScreen.jsx";
 let escapp;
 const initialConfig = {
   config: {
-    theme: THEMES.BASIC,
+    theme: THEMES.FUTURISTIC,
     initialTime: "5:30:49",
   },
 };
