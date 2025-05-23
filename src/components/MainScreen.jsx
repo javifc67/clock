@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import "./../assets/scss/MainScreen.scss";
 import Clock from "./Clock";
-import { GLOBAL_CONFIG } from "../config/config";
 
-export default function MainScreen({ show, config, solvePuzzle, solved, solvedTrigger }) {
+export default function MainScreen({ show, config, solvePuzzle, solved }) {
   const [hour, setHour] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
@@ -22,13 +21,11 @@ export default function MainScreen({ show, config, solvePuzzle, solved, solvedTr
       new Audio(config.theme.tickAudio).play();
       lastPlayedRef.current = now;
     }
-
-    solvePuzzle({ hour, minutes, seconds });
   }, [hour, minutes, seconds]);
 
-  useEffect(() => {
-    if (solved) new Audio(config.theme.removeClockAudio).play();
-  }, [solved]);
+  const dropHandle = () => {
+    solvePuzzle({ hour, minutes, seconds });
+  };
 
   return (
     <div id="MainScreen" className={"screen_wrapper" + (show ? "" : " screen_hidden")}>
@@ -36,10 +33,9 @@ export default function MainScreen({ show, config, solvePuzzle, solved, solvedTr
         className="frame"
         style={{ backgroundImage: `url(${config.theme.backgroundImg})`, height: "100%", width: "100%" }}
       >
-        <div className={`fade-slide ${solved ? "hide" : ""}`}>
-          <Clock className={`fade-slide ${solved ? "hide" : ""}`} theme={config.theme} setTime={setTime} />
+        <div>
+          <Clock theme={config.theme} setTime={setTime} dropHandle={dropHandle} solved={solved} config={config} />
         </div>
-        <div className="result">{GLOBAL_CONFIG.message}</div>
       </div>
     </div>
   );

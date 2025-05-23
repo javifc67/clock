@@ -26,6 +26,13 @@ body {
   background: transparent;
 }
 
+* {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
 .screen_wrapper {
   position: absolute;
   visibility: visible;

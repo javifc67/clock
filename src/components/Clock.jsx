@@ -1,25 +1,68 @@
 import { useEffect, useRef, useState } from "react";
 import "./../assets/scss/Clock.scss";
 
-export default function Clock({ theme, setTime }) {
+export default function Clock({ theme, setTime, dropHandle, solved, config }) {
   const [angles, setAngles] = useState({
-    hour: 170,
-    minute: 180,
-    second: 290,
+    hour: 0,
+    minute: 0,
+    second: 0,
   });
+  const dropTimeout = useRef(null);
+  const dragging = useRef(null);
 
   useEffect(() => {
     setTime(angleToTime(angles.hour, 12), angleToTime(angles.second, 60), angleToTime(angles.minute, 60));
   }, [angles]);
 
-  const dragging = useRef(null);
+  useEffect(() => {
+    if (solved) {
+      setTimeout(() => {
+        new Audio(theme.winAudio).play();
+        setAngles({
+          hour: 0,
+          minute: 0,
+          second: 0,
+        });
+      }, 100);
+    }
+  }, [solved]);
+
+  useEffect(() => {
+    if (config.initialTime === "actual") {
+      const now = new Date();
+      const h = now.getHours() % 12;
+      const m = now.getMinutes();
+      const s = now.getSeconds();
+
+      setAngles({
+        hour: (h / 12) * 360,
+        minute: (m / 60) * 360,
+        second: (s / 60) * 360,
+      });
+    } else if (config.initialTime) {
+      const [h, m, s] = config.initialTime.split(":").map(Number);
+      setAngles({
+        hour: (h / 12) * 360,
+        minute: (m / 60) * 360,
+        second: (s / 60) * 360,
+      });
+    }
+  }, [config]);
 
   const startDrag = (hand) => () => {
+    if (solved) return;
     dragging.current = hand;
   };
 
   const stopDrag = () => {
-    dragging.current = null;
+    if (dragging.current) {
+      if (dropTimeout.current) clearTimeout(dropTimeout.current);
+      dropTimeout.current = setTimeout(() => {
+        dropHandle();
+        dropTimeout.current = null;
+      }, 1000);
+      dragging.current = null;
+    }
   };
 
   const handleMouseMove = (e) => {
@@ -53,7 +96,7 @@ export default function Clock({ theme, setTime }) {
     >
       <img
         src={theme.hourImg}
-        className={`hand hour ${dragging.current === "hour" ? "dragging" : ""}`}
+        className={`hand hour ${dragging.current === "hour" ? "dragging" : ""} ${solved ? "solved" : ""}`}
         style={{
           transform: `rotate(${angles.hour}deg)`,
         }}
@@ -63,18 +106,18 @@ export default function Clock({ theme, setTime }) {
       <img
         src={theme.minuteImg}
         draggable={false}
-        className={`hand minute ${dragging.current === "minute" ? "dragging" : ""}`}
+        className={`hand minute ${dragging.current === "minute" ? "dragging" : ""} ${solved ? "solved" : ""}`}
         style={{ transform: `rotate(${angles.minute}deg)` }}
         onMouseDown={startDrag("minute")}
       />
       <img
         src={theme.secondImg}
         draggable={false}
-        className={`hand second ${dragging.current === "second" ? "dragging" : ""}`}
+        className={`hand second ${dragging.current === "second" ? "dragging" : ""} ${solved ? "solved" : ""}`}
         style={{ transform: `rotate(${angles.second}deg)` }}
         onMouseDown={startDrag("second")}
       />
-      <img className="center" src={theme.clockCenterImg} alt="" />
+      <img className="center" draggable={false} src={theme.clockCenterImg} alt="" />
     </div>
   );
 }

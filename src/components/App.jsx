@@ -13,6 +13,7 @@ let escapp;
 const initialConfig = {
   config: {
     theme: THEMES.BASIC,
+    initialTime: "5:30:49",
   },
 };
 
@@ -22,7 +23,6 @@ export default function App() {
   const [prevScreen, setPrevScreen] = useState(KEYPAD_SCREEN);
   const [fail, setFail] = useState(false);
   const [solved, setSolved] = useState(false);
-  const [solvedTrigger, setSolvedTrigger] = useState(0);
   const [config, setConfig] = useState({});
 
   useEffect(() => {
@@ -59,11 +59,11 @@ export default function App() {
 
   function loadConfig(config) {
     let configuration = {
+      ...config.config,
       theme: {
         name: config.config.theme,
         ...(THEME_ASSETS[config.config.theme] || {}),
       },
-      ...config,
     };
     console.log(configuration);
     setConfig(configuration);
@@ -81,7 +81,6 @@ export default function App() {
         // alert("ta bien");
       }
       setSolved(success);
-      setSolvedTrigger((prev) => prev + 1);
     });
   };
 
@@ -140,13 +139,7 @@ export default function App() {
     <div id="firstnode">
       {config.theme && (
         <div className={`main-background ${fail ? "fail" : ""}`}>
-          <MainScreen
-            show={screen === KEYPAD_SCREEN}
-            config={config}
-            solvePuzzle={solvePuzzle}
-            solved={solved}
-            solvedTrigger={solvedTrigger}
-          />
+          <MainScreen show={screen === KEYPAD_SCREEN} config={config} solvePuzzle={solvePuzzle} solved={solved} />
         </div>
       )}
     </div>
