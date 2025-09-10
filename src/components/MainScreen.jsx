@@ -18,7 +18,7 @@ export default function MainScreen({ show, config, solvePuzzle, solved }) {
   useEffect(() => {
     const now = Date.now();
     if (now - lastPlayedRef.current > 50) {
-      new Audio(config.theme.tickAudio).play();
+      new Audio(config.tickAudio).play();
       lastPlayedRef.current = now;
     }
   }, [hour, minutes, seconds]);
@@ -28,15 +28,8 @@ export default function MainScreen({ show, config, solvePuzzle, solved }) {
   };
 
   return (
-    <div id="MainScreen" className={"screen_wrapper" + (show ? "" : " screen_hidden")}>
-      <div
-        className="frame"
-        style={{ backgroundImage: `url(${config.theme.backgroundImg})`, height: "100%", width: "100%" }}
-      >
-        <div>
-          <Clock theme={config.theme} setTime={setTime} dropHandle={dropHandle} solved={solved} config={config} />
-        </div>
-      </div>
+    <div className="frame">
+      <Clock theme={config} setTime={setTime} dropHandle={dropHandle} solved={solved} config={config} />
     </div>
   );
 }

@@ -10,22 +10,6 @@ div.screen_wrapper {
   border: none;
   overflow: hidden;
 }
-
-.main-background {
-  height: 100vh;
-  width: 100%;
-  // background-color: #2c3e50;
-  background-color: #000000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-html,
-body {
-  background: transparent;
-}
-
 * {
   user-select: none;
   -webkit-user-select: none;
@@ -33,36 +17,34 @@ body {
   -ms-user-select: none;
 }
 
-.screen_wrapper {
+div.screen_wrapper {
   position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 2.1s ease, visibility ease 2.1s;
+}
+
+div.screen_wrapper.active {
+  opacity: 1;
   visibility: visible;
-  &.screen_hidden {
-    opacity: 0;
-    visibility: visible;
-    animation: 1s fadeOut;
-    animation-fill-mode: forwards;
-  }
+  pointer-events: auto;
 }
 
-.screen_wrapper {
-  transition: opacity 700ms ease-in;
+.main-background {
+  height: 100vh;
+  width: 100%;
+  background-color: #2c3e50;
+  display: flex;
+  justify-content: center;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
-@keyframes fadeIn {
-  99% {
-    visibility: hidden;
-  }
-  100% {
-    visibility: visible;
-  }
-}
-@keyframes fadeOut {
-  99% {
-    visibility: visible;
-  }
-  100% {
-    visibility: hidden;
-  }
+html,
+body {
+  background: transparent;
 }
 
 .containers {

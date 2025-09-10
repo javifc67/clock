@@ -1,45 +1,64 @@
-export const PAINTING_SCREEN = "painting";
-export const SAFE_CLOSED_SCREEN = "safe_closed";
-export const SAFE_OPEN_SCREEN = "safe_open";
-export const CONTROL_PANEL_SCREEN = "control_panel";
-export const KEYPAD_SCREEN = "keypad";
+export const DEFAULT_APP_SETTINGS = {
+  skin: "STANDARD",
+  actionWhenLoadingIfSolved: true,
+  initialTime: "5:30:00", //Initial time in format "HH:MM:SS" or "HH:MM"
+  backgroundImg: "images/basic_background.jpg",
+  hourImg: "images/basic_hourhand.png",
+  minuteImg: "images/basic_minutehand.png",
+  secondImg: "images/basic_secondhand.png",
+  clockImg: "images/basic_clock.png",
+  clockCenterImg: "images/basic_clockcenter.png",
+  tickAudio: "sounds/tick.wav",
+  winAudio: "sounds/win.wav",
+};
 
 export const THEMES = {
-  BASIC: "basic",
-  FUTURISTIC: "futuristic",
-  CONTEMPORARY: "contemporary",
-  ANCIENT: "ancient",
+  BASIC: "BASIC",
+  FUTURISTIC: "FUTURISTIC",
+  STANDARD: "STANDARD",
+  RETRO: "RETRO",
 };
 
 export const ICONS = ["circle", "triangle", "square", "pentagon", "star", "hexagon"];
 
 export const THEME_ASSETS = {
-  [THEMES.ANCIENT]: {
-    backgroundImg: "/src/assets/images/ancient_wires_puzzle_bg.png",
-    wireAudio: "sounds/pick-wire.wav",
-  },
-  [THEMES.BASIC]: {
-    backgroundImg: "/src/assets/images/basic_background.jpg",
-    hourImg: "/src/assets/images/basic_hourhand.png",
-    minuteImg: "/src/assets/images/basic_minutehand.png",
-    secondImg: "/src/assets/images/basic_secondhand.png",
-    clockImg: "/src/assets/images/basic_clock.png",
-    clockCenterImg: "/src/assets/images/basic_clockcenter.png",
+  [THEMES.RETRO]: {
+    backgroundImg: "images/retro_background.png",
+    hourImg: "images/retro_hourhand.png",
+    minuteImg: "images/retro_minutehand.png",
+    secondImg: "images/retro_secondhand.png",
+    clockImg: "images/retro_clock.png",
+    clockCenterImg: "images/retro_clockcenter.png",
     tickAudio: "sounds/tick.wav",
     winAudio: "sounds/win.wav",
   },
-  [THEMES.CONTEMPORARY]: {
-    backgroundImg: "/src/assets/images/ancient_wires_puzzle_bg.png",
+  [THEMES.BASIC]: {
+    backgroundImg: "images/basic_background.jpg",
+    hourImg: "images/basic_hourhand.png",
+    minuteImg: "images/basic_minutehand.png",
+    secondImg: "images/basic_secondhand.png",
+    clockImg: "images/basic_clock.png",
+    clockCenterImg: "images/basic_clockcenter.png",
+    tickAudio: "sounds/tick.wav",
+    winAudio: "sounds/win.wav",
+  },
+  [THEMES.STANDARD]: {
+    backgroundImg: "images/ancient_wires_puzzle_bg.png",
     wireAudio: "sounds/pick-wire.wav",
   },
   [THEMES.FUTURISTIC]: {
-    backgroundImg: "/src/assets/images/futuristic_background.png",
+    backgroundImg: "images/futuristic_background.png",
     hourImg: "",
     minuteImg: "",
     secondImg: "",
-    clockImg: "/src/assets/images/futuristic_clock.png",
-    clockCenterImg: "/src/assets/images/futuristic_clockcenter.png",
+    clockImg: "images/futuristic_clock.png",
+    clockCenterImg: "images/futuristic_clockcenter.png",
     tickAudio: "sounds/tick.wav",
     winAudio: "sounds/win.wav",
   },
 };
+
+export const ESCAPP_CLIENT_SETTINGS = {
+  imagesPath: "./images/",
+};
+export const MAIN_SCREEN = "MAIN_SCREEN";

@@ -1,147 +1,209 @@
-import React, { useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import "./../assets/scss/app.scss";
-import "./../assets/scss/modal.scss";
 
-import { GLOBAL_CONFIG } from "../config/config.js";
-import * as I18n from "../vendors/I18n.js";
-import * as LocalStorage from "../vendors/Storage.js";
-
-import { KEYPAD_SCREEN, THEME_ASSETS, THEMES } from "../constants/constants.jsx";
+import { DEFAULT_APP_SETTINGS, ESCAPP_CLIENT_SETTINGS, MAIN_SCREEN, THEME_ASSETS } from "../constants/constants.jsx";
+import { GlobalContext } from "./GlobalContext.jsx";
 import MainScreen from "./MainScreen.jsx";
 
-let escapp;
-const initialConfig = {
-  config: {
-    theme: THEMES.FUTURISTIC,
-    initialTime: "5:30:49",
-  },
-};
-
 export default function App() {
+  const { escapp, setEscapp, appSettings, setAppSettings, Storage, setStorage, Utils, I18n } =
+    useContext(GlobalContext);
+  const hasExecutedEscappValidation = useRef(false);
+
   const [loading, setLoading] = useState(true);
-  const [screen, setScreen] = useState(KEYPAD_SCREEN);
-  const [prevScreen, setPrevScreen] = useState(KEYPAD_SCREEN);
+  const [screen, setScreen] = useState(MAIN_SCREEN);
+  const prevScreen = useRef(screen);
   const [fail, setFail] = useState(false);
   const [solved, setSolved] = useState(false);
   const [config, setConfig] = useState({});
 
   useEffect(() => {
-    console.log("useEffect, lets load everything");
-    // localStorage.clear(); //For development, clear local storage (comentar y descomentar para desarrollo)
-    I18n.init(GLOBAL_CONFIG);
-    LocalStorage.init(GLOBAL_CONFIG.localStorageKey);
-    GLOBAL_CONFIG.escapp.onNewErStateCallback = (er_state) => {
-      console.log("New ER state received from ESCAPP", er_state);
-      restoreState(er_state);
-    };
-    GLOBAL_CONFIG.escapp.onErRestartCallback = (er_state) => {
-      // reset(); //For development
-      console.log("Escape Room Restart received from ESCAPP", er_state);
-      LocalStorage.removeSetting("app_state");
-      LocalStorage.removeSetting("played_door");
-    };
-    escapp = new ESCAPP(GLOBAL_CONFIG.escapp);
-    escapp.validate((success, er_state) => {
-      console.log("ESCAPP validation", success, er_state);
-      try {
-        if (success) {
-          //ha ido bien, restauramos el estado recibido
-          restoreState(er_state);
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    });
-    loadConfig(initialConfig);
+    //Init Escapp client
+    if (escapp !== null) {
+      return;
+    }
+    //Create the Escapp client instance.
+    let _escapp = new ESCAPP(ESCAPP_CLIENT_SETTINGS);
+    setEscapp(_escapp);
+    Utils.log("Escapp client initiated with settings:", _escapp.getSettings());
 
-    setLoading(false);
+    //Use the storage feature provided by Escapp client.
+    setStorage(_escapp.getStorage());
+
+    //Get app settings provided by the Escapp server.
+    let _appSettings = processAppSettings(_escapp.getAppSettings());
+    setAppSettings(_appSettings);
   }, []);
 
-  function loadConfig(config) {
-    let configuration = {
-      ...config.config,
-      theme: {
-        name: config.config.theme,
-        ...(THEME_ASSETS[config.config.theme] || {}),
-      },
-    };
-    console.log(configuration);
-    setConfig(configuration);
+  useEffect(() => {
+    if (!hasExecutedEscappValidation.current && escapp !== null && appSettings !== null && Storage !== null) {
+      hasExecutedEscappValidation.current = true;
+
+      //Register callbacks in Escapp client and validate user.
+      escapp.registerCallback("onNewErStateCallback", function (erState) {
+        try {
+          Utils.log("New escape room state received from ESCAPP", erState);
+          restoreAppState(erState);
+        } catch (e) {
+          Utils.log("Error in onNewErStateCallback", e);
+        }
+      });
+
+      escapp.registerCallback("onErRestartCallback", function (erState) {
+        try {
+          Utils.log("Escape Room has been restarted.", erState);
+          if (typeof Storage !== "undefined") {
+            Storage.removeSetting("state");
+          }
+        } catch (e) {
+          Utils.log("Error in onErRestartCallback", e);
+        }
+      });
+
+      //Validate user. To be valid, a user must be authenticated and a participant of the escape room.
+      escapp.validate((success, erState) => {
+        try {
+          Utils.log("ESCAPP validation", success, erState);
+          if (success) {
+            restoreAppState(erState);
+            setLoading(false);
+          }
+        } catch (e) {
+          Utils.log("Error in validate callback", e);
+        }
+      });
+    }
+  }, [escapp, appSettings, Storage]);
+
+  useEffect(() => {
+    if (screen !== prevScreen.current) {
+      Utils.log("Screen ha cambiado de", prevScreen.current, "a", screen);
+      prevScreen.current = screen;
+    }
+  }, [screen]);
+
+  function restoreAppState(erState) {
+    Utils.log("Restore application state based on escape room state:", erState);
+    const _settings = escapp.getSettings();
+
+    if (!_settings.linkedPuzzleIds || _settings.linkedPuzzleIds.length === 0) {
+      setAppSettings((prevSettings) => {
+        return {
+          ...prevSettings,
+          disableButton: true,
+        };
+      });
+    }
+
+    // Si el puzle está resuelto lo ponemos en posicion de resuelto
+    if (escapp.getAllPuzzlesSolved() && escapp.getLastSolution()) {
+      if (appSettings.actionWhenLoadingIfSolved) {
+        setSolved(true);
+      }
+    }
   }
 
-  const solvePuzzle = (solution) => {
-    const { hour, minutes, seconds } = solution;
+  function processAppSettings(_appSettings) {
+    if (typeof _appSettings !== "object") {
+      _appSettings = {};
+    }
+    if (typeof _appSettings.skin === "undefined" && typeof DEFAULT_APP_SETTINGS.skin === "string") {
+      _appSettings.skin = DEFAULT_APP_SETTINGS.skin;
+    }
+
+    let skinSettings = THEME_ASSETS[_appSettings.skin] || {};
+
+    let DEFAULT_APP_SETTINGS_SKIN = Utils.deepMerge(DEFAULT_APP_SETTINGS, skinSettings);
+
+    // Merge _appSettings with DEFAULT_APP_SETTINGS_SKIN to obtain final app settings
+    _appSettings = Utils.deepMerge(DEFAULT_APP_SETTINGS_SKIN, _appSettings);
+
+    //Init internacionalization module
+    I18n.init(_appSettings);
+
+    if (typeof _appSettings.message !== "string") {
+      _appSettings.message = I18n.getTrans("i.message");
+    }
+
+    //Change HTTP protocol to HTTPs in URLs if necessary
+    _appSettings = Utils.checkUrlProtocols(_appSettings);
+
+    //Preload resources (if necessary)
+    Utils.preloadImages([_appSettings.backgroundMessage]);
+    //Utils.preloadAudios([_appSettings.soundBeep,_appSettings.soundNok,_appSettings.soundOk]); //Preload done through HTML audio tags
+    //Utils.preloadVideos(["videos/some_video.mp4"]);
+    Utils.log("App settings:", _appSettings);
+    return _appSettings;
+  }
+
+  function solvePuzzle(_solution) {
+    const { hour, minutes, seconds } = _solution;
     const pad = (n) => n.toString().padStart(2, "0");
     const solutionStr = `${hour}:${pad(minutes)}:${pad(seconds)}`;
-    console.log("Solving puzzle", solutionStr);
-    escapp.submitPuzzle(GLOBAL_CONFIG.escapp.puzzleId, solutionStr, {}, (success) => {
-      if (!success) {
-        // alert("ta mal");
-      } else {
-        // alert("ta bien");
-      }
-      setSolved(success);
-    });
-  };
 
-  function reset() {
-    escapp.reset();
-    localStorage.clear();
+    Utils.log("solution: ", solutionStr);
+
+    return checkResult(solutionStr);
   }
 
-  function restoreState(er_state) {
-    console.log("Restoring state", er_state);
-    if (typeof er_state !== "undefined" && er_state.puzzlesSolved.length > 0) {
-      let lastPuzzleSolved = Math.max.apply(null, er_state.puzzlesSolved);
-      if (lastPuzzleSolved >= GLOBAL_CONFIG.escapp.puzzleId) {
-        //puzzle superado, abrimos la caja fuerte
-        setScreen(KEYPAD_SCREEN);
-        setPrevScreen(KEYPAD_SCREEN);
-      } else {
-        //puzzle no superado, miramos en localStorage en qué pantalla estábamos
-        let localstateToRestore = LocalStorage.getSetting("app_state");
-        console.log("Restoring screen from local state", localstateToRestore);
-        if (localstateToRestore) {
-          setScreen(localstateToRestore.screen);
-          setPrevScreen(localstateToRestore.prevScreen);
+  function checkResult(_solution) {
+    escapp.checkNextPuzzle(_solution, {}, (success, erState) => {
+      Utils.log("Check solution Escapp response", success, erState);
+      if (success) {
+        setSolved(true);
+        try {
+          setTimeout(() => {
+            submitPuzzleSolution(_solution);
+          }, 2000);
+        } catch (e) {
+          Utils.log("Error in checkNextPuzzle", e);
         }
       }
-      setLoading(false);
+    });
+  }
+  function submitPuzzleSolution(_solution) {
+    Utils.log("Submit puzzle solution", _solution);
+    escapp.submitNextPuzzle(_solution, {}, (success, erState) => {
+      Utils.log("Solution submitted to Escapp", _solution, success, erState);
+    });
+  }
+
+  const renderScreens = (screens) => {
+    if (loading === true) {
+      return null;
     } else {
-      restoreLocalState();
+      return <>{screens.map(({ id, content }) => renderScreen(id, content))}</>;
     }
-  }
+  };
 
-  function saveState() {
-    console.log("Saving state to local storage");
-    let currentState = { screen: screen, prevScreen: prevScreen };
-    LocalStorage.saveSetting("app_state", currentState);
-  }
+  const renderScreen = (screenId, screenContent) => (
+    <div key={screenId} className={`screen_wrapper ${screen === screenId ? "active" : ""}`}>
+      {screenContent}
+    </div>
+  );
 
-  function restoreLocalState() {
-    let stateToRestore = LocalStorage.getSetting("app_state");
-    console.log("Restoring local state", stateToRestore);
-    if (stateToRestore) {
-      setScreen(stateToRestore.screen);
-      setPrevScreen(stateToRestore.prevScreen);
-      setLoading(false);
-    }
-  }
-
-  function onOpenScreen(newscreen_name) {
-    console.log("Opening screen", newscreen_name);
-    setPrevScreen(screen);
-    setScreen(newscreen_name);
-    saveState();
-  }
+  let screens = [
+    {
+      id: MAIN_SCREEN,
+      content: (
+        <div
+          className={`main-background${solved ? " solved" : ""}`}
+          style={{ backgroundImage: appSettings?.backgroundImg ? `url(${appSettings.backgroundImg})` : {} }}
+        >
+          <MainScreen config={appSettings} solvePuzzle={solvePuzzle} solved={solved} />
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <div id="firstnode">
-      {config.theme && (
-        <div className={`main-background ${fail ? "fail" : ""}`}>
-          <MainScreen show={screen === KEYPAD_SCREEN} config={config} solvePuzzle={solvePuzzle} solved={solved} />
-        </div>
-      )}
+    <div
+      id="global_wrapper"
+      className={`${
+        appSettings !== null && typeof appSettings.skin === "string" ? appSettings.skin.toLowerCase() : ""
+      }`}
+    >
+      {renderScreens(screens)}
     </div>
   );
 }
