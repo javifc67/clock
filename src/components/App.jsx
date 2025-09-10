@@ -139,7 +139,8 @@ export default function App() {
   function solvePuzzle(_solution) {
     const { hour, minutes, seconds } = _solution;
     const pad = (n) => n.toString().padStart(2, "0");
-    const solutionStr = `${hour}:${pad(minutes)}:${pad(seconds)}`;
+    let solutionStr = `${hour}:${pad(minutes)}`;
+    if (appSettings.useSeconds) solutionStr += `:${pad(seconds)}`;
 
     Utils.log("solution: ", solutionStr);
 

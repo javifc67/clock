@@ -129,20 +129,26 @@ export default function Clock({ theme, setTime, dropHandle, solved, config }) {
       )}
 
       {/* Second hand */}
-      {theme.secondImg ? (
-        <img
-          src={theme.secondImg}
-          className={`hand second ${dragging.current === "second" ? "dragging" : ""} ${solved ? "solved" : ""}`}
-          style={{ transform: `rotate(${angles.second}deg)` }}
-          onMouseDown={startDrag("second")}
-          draggable={false}
-        />
-      ) : (
-        <div
-          className={`hand neon second ${dragging.current === "second" ? "dragging" : ""} ${solved ? "solved" : ""}`}
-          style={{ transform: `rotate(${angles.second}deg)` }}
-          onMouseDown={startDrag("second")}
-        />
+      {config.useSeconds && (
+        <>
+          {theme.secondImg ? (
+            <img
+              src={theme.secondImg}
+              className={`hand second ${dragging.current === "second" ? "dragging" : ""} ${solved ? "solved" : ""}`}
+              style={{ transform: `rotate(${angles.second}deg)` }}
+              onMouseDown={startDrag("second")}
+              draggable={false}
+            />
+          ) : (
+            <div
+              className={`hand neon second ${dragging.current === "second" ? "dragging" : ""} ${
+                solved ? "solved" : ""
+              }`}
+              style={{ transform: `rotate(${angles.second}deg)` }}
+              onMouseDown={startDrag("second")}
+            />
+          )}
+        </>
       )}
       <img className="center" draggable={false} src={theme.clockCenterImg} alt="" />
     </div>

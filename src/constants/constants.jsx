@@ -1,6 +1,7 @@
 export const DEFAULT_APP_SETTINGS = {
   skin: "STANDARD",
   actionWhenLoadingIfSolved: true,
+  useSeconds: true,
   initialTime: "5:30:00", //Initial time in format "HH:MM:SS" or "HH:MM"
   backgroundImg: "images/basic_background.jpg",
   hourImg: "images/basic_hourhand.png",
@@ -32,7 +33,7 @@ export const THEME_ASSETS = {
     tickAudio: "sounds/tick.wav",
     winAudio: "sounds/win.wav",
   },
-  [THEMES.BASIC]: {
+  [THEMES.STANDARD]: {
     backgroundImg: "images/basic_background.jpg",
     hourImg: "images/basic_hourhand.png",
     minuteImg: "images/basic_minutehand.png",
@@ -41,10 +42,6 @@ export const THEME_ASSETS = {
     clockCenterImg: "images/basic_clockcenter.png",
     tickAudio: "sounds/tick.wav",
     winAudio: "sounds/win.wav",
-  },
-  [THEMES.STANDARD]: {
-    backgroundImg: "images/ancient_wires_puzzle_bg.png",
-    wireAudio: "sounds/pick-wire.wav",
   },
   [THEMES.FUTURISTIC]: {
     backgroundImg: "images/futuristic_background.png",

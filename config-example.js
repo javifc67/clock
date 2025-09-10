@@ -2,10 +2,11 @@
 
 export let ESCAPP_APP_SETTINGS = {
   //Settings that can be specified by the authors
-  skin: "BASIC", //skin can be "STANDARD", "RETRO" or "FUTURISTIC" or "BASIC".
+  skin: "BASIC", //skin can be "STANDARD", "RETRO" or "FUTURISTIC".
   //backgroundImg: "NONE", //background can be "NONE" or a URL.
   actionWhenLoadingIfSolved: true,
-  initialTime: "5:30:00", //Initial time in format "H:MM:SS" or "MM:SS"
+  useSeconds: true,
+  initialTime: "5:30:00", //Initial time in format "H:MM:SS" or "H:MM"
 
   //Settings that will be automatically specified by the Escapp server
   locale: "es",
